@@ -37,4 +37,12 @@ class MessageModel {
       'data': data,
     };
   }
+
+  factory MessageModel.fromMap(Map<String, dynamic> map) {
+    return MessageModel(
+      fromIp: map['fromIp'] as String,
+      type: MessageChunkType.values[map['type'] as int],
+      data: Uint8List.fromList(map['data'] as List<int>),
+    );
+  }
 }

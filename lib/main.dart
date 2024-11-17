@@ -31,13 +31,13 @@ class _MainAppState extends State<MainApp> {
   late String thisDevice;
   late String otherDevices;
 
-  final audioStreamChannels = Channels.stereo;
-  final audioStreamFormat = BufferPcmType.f32le;
+  final audioStreamChannels = Channels.mono;
+  final audioStreamFormat = BufferPcmType.s16le;
 
-  final recorderFormat = PCMFormat.f32le;
-  final recorderChannels = RecorderChannels.stereo;
+  final recorderFormat = PCMFormat.s16le;
+  final recorderChannels = RecorderChannels.mono;
 
-  final sampleRate = 44100;
+  final sampleRate = 11050;
 
   final soloud = SoLoud.instance;
   final recorder = Recorder.instance;
@@ -64,8 +64,9 @@ class _MainAppState extends State<MainApp> {
     /// Listen for imcoming data.
     Manager.instance.serverStream.listen(
       (data) {
-        final decompress = lz.LZString.decompressFromBase64Sync(data as String);
-        final msg = jsonDecode(decompress!) as Map<String, dynamic>;
+        debugPrint('Received data from server of type $data}');
+        // final decompress = lz.LZString.decompressFromBase64Sync(data as String);
+        final msg = jsonDecode(data as String) as Map<String, dynamic>;
         final fromIp = msg['fromIp'] as String;
         final type = MessageChunkType.values[msg['type'] as int];
 

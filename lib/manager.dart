@@ -19,7 +19,7 @@ interface class Manager {
   /// Websocket server.
   WebSocketServer? server;
 
-  /// List of devices with a websocket listeninf to the port scanned.
+  /// List of devices with a websocket listening to the port scanned.
   List<WebSocketClient> connections = [];
 
   /// List of devices found in the network.
@@ -50,14 +50,19 @@ interface class Manager {
 
   /// Connect all the devices in the list
   Future<void> connectDevices() async {
-    for (final device in devices) {
-      final client = WebSocketClient(url: 'ws://$device:$port/ws');
-      if (await client.connect()) {
-        connections.add(client);
-      } else {
-        throw Exception('Failed to connect to $device');
-      }
-    }
+    devices.clear();
+    final client = WebSocketClient(url: 'wss://wk.besimsoft.dev/ws');
+    await client.connect();
+    connections.add(client);
+
+    // for (final device in devices) {
+    //   final client = WebSocketClient(url: 'ws://$device:$port/ws');
+    //   if (await client.connect()) {
+    //     connections.add(client);
+    //   } else {
+    //     throw Exception('Failed to connect to $device');
+    //   }
+    // }
   }
 
   /// Disconnect all the connected devices
@@ -79,11 +84,11 @@ interface class Manager {
   /// Broadcast a message to all the connected devices
   void sendBroadcastMessage(dynamic message) {
     for (final connection in connections) {
-      final l = lz.LZString.compressToBase64Sync(message.toString());
-      debugPrint('Sending message: before compression: '
-          '${(message as String).length} bytes, '
-          'after compression: ${l!.length} bytes');
-      connection.send(l);
+      // final l = lz.LZString.compressToBase64Sync(message.toString());
+      // debugPrint('Sending message: before compression: '
+      //     '${(message as String).length} bytes, '
+      //     'after compression: ${l!.length} bytes');
+      connection.send(message);
     }
   }
 
