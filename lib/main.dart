@@ -10,6 +10,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:walky_talky/manager.dart';
 import 'package:walky_talky/models/message_model.dart';
+import 'package:lzstring/lzstring.dart' as lz;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,7 +64,8 @@ class _MainAppState extends State<MainApp> {
     /// Listen for imcoming data.
     Manager.instance.serverStream.listen(
       (data) {
-        final msg = jsonDecode(data as String) as Map<String, dynamic>;
+        final decompress = lz.LZString.decompressFromBase64Sync(data as String);
+        final msg = jsonDecode(decompress!) as Map<String, dynamic>;
         final fromIp = msg['fromIp'] as String;
         final type = MessageChunkType.values[msg['type'] as int];
 
@@ -146,8 +148,8 @@ class _MainAppState extends State<MainApp> {
     /// Initialize the player and the recorder.
     await soloud.init(channels: Channels.mono, sampleRate: sampleRate);
     soloud.filters.echoFilter.activate();
-    soloud.filters.echoFilter.delay.value = 0.2;
-    soloud.filters.echoFilter.decay.value = 0.3;
+    soloud.filters.echoFilter.delay.value = 0.1;
+    soloud.filters.echoFilter.decay.value = 0.2;
 
     recorder.init(
       format: recorderFormat,

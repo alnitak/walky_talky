@@ -16,7 +16,7 @@ class Network {
 
     final hosts = <NetworkAddress>[];
     stream.listen((NetworkAddress addr) {
-      if (localIp == addr.ip) return;
+      // if (localIp == addr.ip) return;
       hosts.add(addr);
       debugPrint('Found device: ${addr.ip}: ${addr.openPorts}');
     }).onDone(() {

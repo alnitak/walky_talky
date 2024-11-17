@@ -6,7 +6,7 @@ import 'package:network_discovery/network_discovery.dart';
 
 /// Class that manage the websocket server.
 class WebSocketServer {
-/// Constructor to initialize the port
+  /// Constructor to initialize the port
   WebSocketServer({
     required this.socketStreamCtrl,
     required this.port,

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:lzstring/lzstring.dart' as lz;
 import 'package:walky_talky/network/network.dart';
 import 'package:walky_talky/network/ws_client.dart';
 import 'package:walky_talky/network/ws_server.dart';
@@ -77,7 +79,11 @@ interface class Manager {
   /// Broadcast a message to all the connected devices
   void sendBroadcastMessage(dynamic message) {
     for (final connection in connections) {
-      connection.send(message);
+      final l = lz.LZString.compressToBase64Sync(message.toString());
+      debugPrint('Sending message: before compression: '
+          '${(message as String).length} bytes, '
+          'after compression: ${l!.length} bytes');
+      connection.send(l);
     }
   }
 

@@ -19,6 +19,8 @@ dependencies:
       url: https://github.com/alnitak/flutter_soloud.git
       ref: websocket
 
+  lzstring: ^2.0.0+2
+
   network_discovery: ^1.0.0
   permission_handler: ^11.3.1
   web_socket_channel: ^3.0.1

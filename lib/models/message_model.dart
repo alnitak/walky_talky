@@ -37,5 +37,4 @@ class MessageModel {
       'data': data,
     };
   }
-  
 }
