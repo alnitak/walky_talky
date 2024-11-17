@@ -1,0 +1,33 @@
+name: walky_talky
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_recorder:
+    git:
+      url: https://github.com/alnitak/flutter_recorder.git
+  
+  flutter_soloud:
+    git:
+      url: https://github.com/alnitak/flutter_soloud.git
+      ref: websocket
+
+  network_discovery: ^1.0.0
+  permission_handler: ^11.3.1
+  web_socket_channel: ^3.0.1
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^6.0.0
+
+flutter:
+  uses-material-design: true
