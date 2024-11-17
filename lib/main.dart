@@ -12,6 +12,8 @@ import 'package:walky_talky/manager.dart';
 import 'package:walky_talky/models/message_model.dart';
 import 'package:lzstring/lzstring.dart' as lz;
 
+import 'network/ws_client.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -41,6 +43,7 @@ class _MainAppState extends State<MainApp> {
 
   final soloud = SoLoud.instance;
   final recorder = Recorder.instance;
+  late final WebSocketClient client;
   AudioSource? audioSource;
   MessageChunkType messageChunkType = MessageChunkType.first;
 
@@ -60,62 +63,6 @@ class _MainAppState extends State<MainApp> {
         }
       });
     }
-
-    /// Listen for imcoming data.
-    Manager.instance.serverStream.listen(
-      (data) {
-        debugPrint('Received data from server of type $data}');
-        // final decompress = lz.LZString.decompressFromBase64Sync(data as String);
-        final msg = jsonDecode(data as String) as Map<String, dynamic>;
-        final fromIp = msg['fromIp'] as String;
-        final type = MessageChunkType.values[msg['type'] as int];
-
-        /// Convert the "data" map value to a Uint8List
-        final chunks =
-            Uint8List.fromList((msg['data'] as List<dynamic>).cast<int>());
-
-        switch (type) {
-          case MessageChunkType.first:
-            if (context.mounted) {
-              setState(() {
-                messageTextController.text = 'Receiving from $fromIp';
-              });
-            }
-            initAudioSource();
-
-            /// A bit of buffering needed before playing the stream.
-            if (audioSource != null) {
-              soloud
-                ..addAudioDataStream(audioSource!, chunks)
-                ..play(audioSource!, volume: 4);
-            }
-
-          case MessageChunkType.middle:
-            if (audioSource != null) {
-              soloud.addAudioDataStream(audioSource!, chunks);
-              if (context.mounted) {
-                setState(() {
-                  messageTextController.text = chunks.sublist(0, 10).toString();
-                });
-              }
-            }
-          case MessageChunkType.last:
-            // disposeAudioSource();
-            if (audioSource != null) {
-              soloud.setDataIsEnded(audioSource!);
-              debugPrint('Data is ended');
-              if (context.mounted) {
-                setState(() {
-                  messageTextController.text = 'Data is ended from $fromIp';
-                });
-              }
-            }
-        }
-      },
-      onDone: () {
-        debugPrint('Done');
-      },
-    );
 
     /// Listen for microphne data.
     recorder.uint8ListStream.listen((data) {
@@ -146,6 +93,73 @@ class _MainAppState extends State<MainApp> {
   }
 
   Future<void> init() async {
+    client = WebSocketClient(url: 'ws://85.235.140.169:1010/ws');
+    await client.connect();
+
+    /// Listen for imcoming data.
+    client.channel?.stream.listen(
+      (data) {
+
+        if(data.toString() == 'USER CONNECTED') {
+          return;
+        }
+print(data);
+        try {
+          //debugPrint('Received data from server of type $data}');
+          // final decompress = lz.LZString.decompressFromBase64Sync(data as String);
+          final msg = jsonDecode(data as String) as Map<String, dynamic>;
+          final fromIp = msg['fromIp'] as String;
+          final type = MessageChunkType.values[msg['type'] as int];
+
+          /// Convert the "data" map value to a Uint8List
+          final chunks =
+              Uint8List.fromList((msg['data'] as List<dynamic>).cast<int>());
+
+          switch (type) {
+            case MessageChunkType.first:
+              if (context.mounted) {
+                setState(() {
+                  messageTextController.text = 'Receiving from $fromIp';
+                });
+              }
+              initAudioSource();
+
+              /// A bit of buffering needed before playing the stream.
+              if (audioSource != null) {
+                soloud
+                  ..addAudioDataStream(audioSource!, chunks)
+                  ..play(audioSource!, volume: 4);
+              }
+
+            case MessageChunkType.middle:
+              if (audioSource != null) {
+                soloud.addAudioDataStream(audioSource!, chunks);
+                if (context.mounted) {
+                  setState(() {
+                    messageTextController.text =
+                        chunks.sublist(0, 10).toString();
+                  });
+                }
+              }
+            case MessageChunkType.last:
+              // disposeAudioSource();
+              if (audioSource != null) {
+                soloud.setDataIsEnded(audioSource!);
+                debugPrint('Data is ended');
+                if (context.mounted) {
+                  setState(() {
+                    messageTextController.text = 'Data is ended from $fromIp';
+                  });
+                }
+              }
+          }
+        } catch (e) {}
+      },
+      onDone: () {
+        debugPrint('Done');
+      },
+    );
+
     /// Initialize the player and the recorder.
     await soloud.init(channels: Channels.mono, sampleRate: sampleRate);
     soloud.filters.echoFilter.activate();

@@ -51,10 +51,12 @@ interface class Manager {
   /// Connect all the devices in the list
   Future<void> connectDevices() async {
     devices.clear();
-    final client = WebSocketClient(url: 'wss://wk.besimsoft.dev/ws');
+    final client = WebSocketClient(url: 'ws://85.235.140.169:1010/ws');
     await client.connect();
     connections.add(client);
-
+    client.channel!.stream.listen((data) {
+      print(data);
+    });
     // for (final device in devices) {
     //   final client = WebSocketClient(url: 'ws://$device:$port/ws');
     //   if (await client.connect()) {
