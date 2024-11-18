@@ -19,7 +19,7 @@ interface class Manager {
   /// Websocket server.
   WebSocketServer? server;
 
-  /// List of devices with a websocket listeninf to the port scanned.
+  /// List of devices with a websocket listening to the port scanned.
   List<WebSocketClient> connections = [];
 
   /// List of devices found in the network.

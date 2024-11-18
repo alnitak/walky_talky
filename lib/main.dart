@@ -31,13 +31,13 @@ class _MainAppState extends State<MainApp> {
   late String thisDevice;
   late String otherDevices;
 
-  final audioStreamChannels = Channels.stereo;
-  final audioStreamFormat = BufferPcmType.f32le;
+  final audioStreamChannels = Channels.mono;
+  final audioStreamFormat = BufferPcmType.s16le;
 
-  final recorderFormat = PCMFormat.f32le;
-  final recorderChannels = RecorderChannels.stereo;
+  final recorderFormat = PCMFormat.s16le;
+  final recorderChannels = RecorderChannels.mono;
 
-  final sampleRate = 44100;
+  final sampleRate = 11050;
 
   final soloud = SoLoud.instance;
   final recorder = Recorder.instance;
